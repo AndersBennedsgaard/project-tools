@@ -2,21 +2,42 @@ import math
 import numpy as np
 
 
-def ceil(var, d=0):
-    return round(var + 0.5 * 10**(-d), d)
-
-
-def remove_diagonal(arr):
-    """Removes the diagonal of a numpy array
+def rotate_3d(array, yaw, pitch, roll):
+    """Rotates 3D points around (0, 0, 0)
 
     Args:
-        arr (np.ndarray): square n*n array
+        array ([type]): [description]
+        yaw ([type]): [description]
+        pitch ([type]): [description]
+        roll ([type]): [description]
 
     Returns:
-        np.ndarray: rectangular n*(n-1) array
+        [type]: [description]
     """
-    final_arr = arr[~np.eye(arr.shape[0], dtype=bool)].reshape(arr.shape[0], -1)
-    return final_arr
+    yaw = yaw * np. pi / 180
+    pitch = pitch * np. pi / 180
+    roll = roll * np. pi / 180
+    yaw = np.array([
+        [np.cos(yaw), -np.sin(yaw), 0],
+        [np.sin(yaw), np.cos(yaw), 0],
+        [0, 0, 1]
+    ])
+    pitch = np.array([
+        [np.cos(pitch), 0, np.sin(pitch)],
+        [0, 1, 0],
+        [-np.sin(pitch), 0, np.cos(pitch)]
+    ])
+    roll = np.array([
+        [1, 0, 0],
+        [0, np.cos(roll), -np.sin(roll)],
+        [0, np.sin(roll), np.cos(roll)]
+    ])
+    rot_mat = yaw @ pitch @ roll
+    return (rot_mat @ array.T).T
+
+
+def ceil(var, d=0):
+    return round(var + 0.5 * 10**(-d), d)
 
 
 def cutoff_function(distances, r_cutoff):
@@ -46,12 +67,3 @@ def cutoff_function(distances, r_cutoff):
     else:
         raise ValueError("Distances-matrix too high-dimensional")
     return f_c
-
-
-def list_of_tuples(*args):
-    assert all([isinstance(arg, list) for arg in args]), "arguments given must be lists"
-    if len(args) == 2:
-        return list(map(lambda x, y: (x, y), args[0], args[1]))
-    if len(args) == 3:
-        return list(map(lambda x, y, z: (x, y, z), args[0], args[1], args[2]))
-    raise ValueError("Length of arguments not implemented")

@@ -45,13 +45,12 @@
 #
 # Created by Anthony Thyssen   5 September 2007
 #
-PROGNAME=`type $0 | awk '{print $3}'`  # search for executable on path
-PROGDIR=`dirname $PROGNAME`            # extract directory of program
-PROGNAME=`basename $PROGNAME`          # base name of program
-Usage() {                              # output the script comments as docs
+PROGNAME=$(type "$0" | awk '{print $3}') # search for executable on path
+PROGDIR=$(dirname "$PROGNAME")           # extract directory of program
+PROGNAME=$(basename "$PROGNAME")         # base name of program
+Usage() {                                # output the script comments as docs
   echo >&2 "$PROGNAME:" "$@"
-  sed >&2 -n '/^###/q; /^#/!q; s/^#//; s/^ //; 3s/^/Usage: /; 2,$ p' \
-          "$PROGDIR/$PROGNAME"
+  sed >&2 -n '/^###/q; /^#/!q; s/^#//; s/^ //; 3s/^/Usage: /; 2,$ p' "$PROGDIR/$PROGNAME"
   exit 10;
 }
 
@@ -91,7 +90,7 @@ done
 if [ "X$crop" != 'X' ]; then
   case "$crop" in
     *[+-]*)
-      extent=`echo "$crop" | sed 's/[+-].*//'`
+      extent=$(echo "$crop" | sed 's/[+-].*//')
       ;;
     *)
       extent="$crop"
@@ -114,8 +113,7 @@ fi
 #convert "$@" -set label "$label" -background $color $resize miff:- |
 # Do each image seperatally as they could be very large
 for img in "$@"; do
-  convert $jpeg "$img" -set label "$label" \
-          -background $color $resize miff:-
+  convert $jpeg "$img" -set label "$label" -background $color $resize miff:-
 done |
   montage - -geometry +0+0 -tile 1x1 -background $color miff:- |
     if [ "X$output" = "X" ]; then
