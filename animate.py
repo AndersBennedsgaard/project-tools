@@ -8,6 +8,9 @@ from ase.data import covalent_radii
 from lib.maths import get_structures
 
 
+raise NameError("Animation not working")
+
+
 def init():
     print("Initializing movie", flush=True)
     line.set_data([], [])
@@ -24,7 +27,7 @@ def update(i):
     cs = strucs[epi]
     bs = best_strucs[epi]
 
-    line.set_data(range(len(energies[:epi+1])), energies[:epi+1])
+    line.set_data(range(len(energies[:epi + 1])), energies[:epi + 1])
     cdot.set_offsets([epi, ce])
     bdot.set_offsets([bepi, be])
 
@@ -39,8 +42,8 @@ def get_patches(struc):
     patches = []
     for num, p in zip(struc.numbers, struc.positions):
         circle = plt.Circle(
-                [p[0], p[1]], radius=covalent_radii[num] * 0.7
-                )
+            [p[0], p[1]], radius=covalent_radii[num] * 0.7
+        )
         patches.append(circle)
     return patches
 
@@ -90,15 +93,15 @@ for i, (energy, struc) in enumerate(zip(energies, strucs)):
 
 patches = get_patches(strucs[0])
 collection_cs = clt.PatchCollection(
-        patches, ec='k', lw=0.5, facecolors=[jmol_colors[num] for num in strucs[0].numbers]
-        )
+    patches, ec='k', lw=0.5, facecolors=[jmol_colors[num] for num in strucs[0].numbers]
+)
 collection_bs = clt.PatchCollection(
-        patches, ec='k', lw=0.5, facecolors=[jmol_colors[num] for num in strucs[0].numbers]
-        )
+    patches, ec='k', lw=0.5, facecolors=[jmol_colors[num] for num in strucs[0].numbers]
+)
 ################
 
 fig = plt.figure(figsize=(6, 6))
-gs = fig.add_gridspec(ncols=2, nrows=2, height_ratios=[1,2], left=0.15, right=0.95, top=0.925, bottom=0.1, hspace=0.05)
+gs = fig.add_gridspec(ncols=2, nrows=2, height_ratios=[1, 2], left=0.15, right=0.95, top=0.925, bottom=0.1, hspace=0.05)
 
 ax_cs = fig.add_subplot(gs[0, 0])
 ax_bs = fig.add_subplot(gs[0, 1])
@@ -112,7 +115,8 @@ ax_cs.add_collection(collection_cs)
 ax_bs.add_collection(collection_bs)
 
 ax_e.set_xlim(0, len(energies))
-ax_e.set_ylim(min(energies) - 0.05 * (max(energies)-min(energies)), max(energies) + 0.05 * (max(energies)-min(energies)))
+ax_e.set_ylim(min(energies) - 0.05 * (max(energies) - min(energies)),
+              max(energies) + 0.05 * (max(energies) - min(energies)))
 
 ax_e.set_xlabel("Episodes", fontsize=14)
 ax_e.set_ylabel("Energy", fontsize=14)
@@ -128,8 +132,7 @@ for ax in [ax_cs, ax_bs]:
     ax.set_xticklabels([])
     ax.set_yticklabels([])
 
-anim = FuncAnimation(fig, update, interval=150, frames=len(energies)//step, blit=False, repeat=False)
+anim = FuncAnimation(fig, update, interval=150, frames=len(energies) // step, blit=False, repeat=False)
 anim.save('C7_EP_E.gif', writer='imagemagick', dpi=150)
 
 # plt.show()
-

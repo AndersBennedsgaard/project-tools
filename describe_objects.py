@@ -63,4 +63,3 @@ def set_summary(ar):
     print(space + "Number of entries: " + str(len(ar)))
     if len(ar) < 10:
         print(space + "Value: " + str(ar))
-

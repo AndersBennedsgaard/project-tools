@@ -1,0 +1,8 @@
+replace string in all files in directory:
+$ find . -name '*.py' -exec sed -i -e "s/string1/string2/g" {} \;
+
+copy file and append to filename before extension (removes .py, adds _x.py here):
+$ for f in *.py; do cp -v -- "$f" "${f%.py}_x.py"; done
+
+split image and append vertically
+$ convert image.png -crop 3x1@ +rebase -append new_image.png
