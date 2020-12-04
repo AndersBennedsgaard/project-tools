@@ -1,5 +1,8 @@
 import time
+import warnings
 from functools import wraps
+
+# https://wiki.python.org/moin/PythonDecoratorLibrary
 
 
 def timeit(func):
@@ -38,6 +41,7 @@ def retry(tries, delay=3.0, backoff=2.0):
         raise ValueError("delay must be greater than 0")
 
     def deco_retry(func):
+        @wraps(func)
         def func_retry(*args, **kwargs):
             mtries, mdelay = tries, delay  # make mutable
 
@@ -55,3 +59,64 @@ def retry(tries, delay=3.0, backoff=2.0):
             return False  # Ran out of tries
         return func_retry  # true decorator -> decorated function
     return deco_retry  # @retry(arg[, ...]) -> true decorator
+
+
+class countcalls:
+    """Decorator that keeps track of the number of times a function is called.
+
+    Example:
+
+    @countcalls\n
+    def f():
+    print('f called')
+
+    f()\n
+    f()\n
+    print f.count() # prints 2\n
+    print countcalls.counts() # same as f.counts()
+    """
+
+    __instances = {}
+
+    def __init__(self, f):
+        self.__f = f
+        self.__numcalls = 0
+        countcalls.__instances[f] = self
+
+    def __call__(self, *args, **kwargs):
+        self.__numcalls += 1
+        return self.__f(*args, **kwargs)
+
+    def count(self):
+        """Return the number of times the function f was called.
+
+        Returns:
+            int: Number of times the function/method has been called
+        """
+        return countcalls.__instances[self.__f].__numcalls
+
+    @staticmethod
+    def counts():
+        """Return a dict of {function: # of calls} for all registered functions.
+
+        Returns:
+            dict: A count for each function that has been called
+        """
+        return dict([(f.__name__, countcalls.__instances[f].__numcalls) for f in countcalls.__instances])
+
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions as deprecated.
+    It will result in a warning being emitted when the function is used.
+    """
+
+    @wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.warn_explicit(
+            "Call to deprecated function {}.".format(func.__name__),
+            category=DeprecationWarning,
+            filename=func.func_code.co_filename,
+            lineno=func.func_code.co_firstlineno + 1
+        )
+        return func(*args, **kwargs)
+    return new_func
